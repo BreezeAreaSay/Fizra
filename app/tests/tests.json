@@ -1,0 +1,104 @@
+[
+  {
+    "name": "Teacher creates a group and gets a QR code for students",
+    "sanity": true,
+    "viewport": "desktop",
+    "covers": [
+      "group creation (POST /api/groups)",
+      "teacher dashboard load (GET /api/groups/:code/dashboard)",
+      "student link and QR code",
+      "persistence after reload"
+    ],
+    "description": "Verifies a teacher can create a group and lands on a working panel with a QR code that survives a reload.",
+    "steps": [
+      "Open the app home page",
+      "Click 'Создать группу'",
+      "Type 'ИВТ-21' into 'Название группы' and '+7 999 123-45-67' into 'Ваш телефон для SMS'",
+      "Click the 'Создать группу' button",
+      "Refresh the page"
+    ],
+    "expected": "The teacher panel shows the title 'ИВТ-21', a QR code, a student link containing '#/s/', the text 'Тревог нет — всё спокойно.' and 'Пока никто не подключился', both before and after the refresh."
+  },
+  {
+    "name": "Student registers via the group link and appears in the teacher list",
+    "viewport": "desktop",
+    "covers": [
+      "student registration (POST /api/groups/:code/students)",
+      "public group info (GET /api/groups/:code)",
+      "realtime student list update (POST /api/subscriptions)",
+      "student phone visible to teacher"
+    ],
+    "description": "Verifies a student who opens the QR link and registers shows up live in the teacher's list with their phone number.",
+    "setup": [
+      "Actor A creates a group named 'ИВТ-21' with phone '+7 999 123-45-67' and keeps the teacher panel open"
+    ],
+    "steps": [
+      "Actor B opens the student link shown on Actor A's panel (the address ending with '#/s/' plus the group code)",
+      "Actor B types 'Иванов Иван' into 'Фамилия и имя' and '+7 912 345-67-89' into 'Твой телефон'",
+      "Actor B clicks 'Готово'",
+      "Actor A looks at the 'Студенты' section without reloading"
+    ],
+    "expected": "Actor B sees a large SOS button and the name 'Иванов Иван'. Actor A's 'Студенты' list shows 'Иванов Иван' with the phone '+7 912 345-67-89'."
+  },
+  {
+    "name": "SOS alert reaches the teacher panel and the teacher responds",
+    "viewport": "mobile",
+    "covers": [
+      "SOS alert creation (POST /api/groups/:code/alerts)",
+      "realtime alert on teacher panel",
+      "teacher acknowledges (POST /api/groups/:code/alerts/:id/ack)",
+      "teacher closes alert (POST /api/groups/:code/alerts/:id/close)",
+      "realtime alert status for student"
+    ],
+    "description": "Verifies an SOS from a student appears on the teacher panel with name and phone, and the student sees the teacher's response.",
+    "setup": [
+      "Actor A creates a group named 'ИВТ-21' with phone '+7 999 123-45-67' and keeps the teacher panel open",
+      "Actor B opens the student link and registers as 'Иванов Иван' with phone '+7 912 345-67-89'"
+    ],
+    "steps": [
+      "Actor B taps the SOS button",
+      "Actor A clicks 'Принял, иду' on the new alert card",
+      "Actor A clicks 'Закрыть тревогу' on the same card"
+    ],
+    "expected": "After the SOS, Actor B sees 'Тревога отправлена' and Actor A sees an alert card with 'Иванов Иван', '+7 912 345-67-89' and 'Нужна помощь'. After 'Принял, иду' Actor B sees 'Преподаватель увидел тревогу и идёт к тебе'. After closing, Actor B sees 'Тревога закрыта' and the alert moves to the 'Журнал' section on Actor A's panel."
+  },
+  {
+    "name": "Student cancels an alert and teacher removes a student with confirmation",
+    "viewport": "desktop",
+    "covers": [
+      "student cancels alert (POST /api/groups/:code/alerts/:id/cancel)",
+      "student removal (DELETE /api/groups/:code/students/:id)",
+      "destructive-action confirmation",
+      "persistence after reload"
+    ],
+    "description": "Verifies a cancelled alert lands in the teacher's history and a confirmed student removal stays removed after reload.",
+    "setup": [
+      "Actor A creates a group named 'ИВТ-21' with phone '+7 999 123-45-67' and keeps the teacher panel open",
+      "Actor B opens the student link and registers as 'Петрова Анна' with phone '+7 900 111-22-33'",
+      "Actor B taps the SOS button"
+    ],
+    "steps": [
+      "Actor B clicks 'Отменить — всё в порядке' and confirms the dialog",
+      "Actor A clicks the remove button next to 'Петрова Анна' in the 'Студенты' list and confirms the dialog",
+      "Actor A refreshes the page"
+    ],
+    "expected": "Actor B sees 'Тревога отменена'. Actor A's 'Журнал' shows 'Петрова Анна — отменена студентом', and after the refresh 'Петрова Анна' is no longer in the 'Студенты' list."
+  },
+  {
+    "name": "Required fields are validated",
+    "viewport": "mobile",
+    "covers": [
+      "required-phone validation for group creation",
+      "required name and phone validation for student registration",
+      "invalid-write guardrail"
+    ],
+    "description": "Verifies empty forms are rejected with visible messages and nothing is created.",
+    "steps": [
+      "Open the app home page and click 'Создать группу'",
+      "Leave 'Ваш телефон для SMS' empty and click the 'Создать группу' button",
+      "Fill '+7 999 123-45-67' as the phone, create the group, open the student link from the panel",
+      "On the student page leave both fields empty and click 'Готово'"
+    ],
+    "expected": "The group form shows a message starting with 'Укажите номер телефона' and stays on the form; the student form shows 'Напиши фамилию и имя.' and no SOS button appears."
+  }
+]
