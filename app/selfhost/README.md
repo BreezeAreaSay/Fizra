@@ -37,6 +37,20 @@ docker compose up -d --build
 
 Данные — в папке `./data`.
 
+## Если nginx сам работает в Docker (порты 80/443 держит `docker-proxy`)
+
+Тогда nginx не видит `127.0.0.1:3077` на сервере. Кнопку запускаем тоже в Docker, в сети этого nginx — одним скриптом:
+
+```bash
+systemctl disable --now fizra-sos      # если уже запускали как службу
+bash attach-to-docker-nginx.sh <контейнер-nginx> <папка с конфигом или шаблонами nginx>
+# например: bash attach-to-docker-nginx.sh durag-nginx-1 /opt/durag/deploy/nginx/templates
+```
+
+Скрипт запускает кнопку в Docker (`docker-compose.proxy.yml`), добавляет в HTTPS-сервер nginx блок `location /sos/` (старый файл сохраняется с суффиксом `.bak-sos`) и перезапускает nginx — сайт на несколько секунд моргнёт. Если nginx не примет конфиг, скрипт вернёт старый. Повторный запуск безопасен: блок не добавится второй раз.
+
+Данные — в папке `./data`. Кнопка откроется по адресу `https://<ваш домен>/sos/`.
+
 ## 3. Открыть наружу через ваш веб-сервер
 
 - **nginx** — готовые блоки в `nginx.conf.example`: путь `https://ваш-домен/sos/` или поддомен `https://sos.ваш-домен/`. После правки: `sudo nginx -t && sudo systemctl reload nginx`.

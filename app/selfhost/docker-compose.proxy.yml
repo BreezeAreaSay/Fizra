@@ -1,0 +1,17 @@
+# Вариант для nginx, который сам работает в Docker: кнопка подключается к его сети,
+# наружу никакие порты не открываются.
+# Запуск: PROXY_NETWORK=имя_сети_nginx docker compose -f docker-compose.proxy.yml up -d --build
+services:
+  sos:
+    build: .
+    container_name: fizra-sos
+    restart: unless-stopped
+    volumes:
+      - ./data:/data
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK:?укажите сеть nginx, например PROXY_NETWORK=durag_default}
