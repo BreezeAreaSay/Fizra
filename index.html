@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Тревожная кнопка</title>
+  <meta name="description" content="Стало плохо на физкультуре — нажми кнопку, и преподавателю уйдёт SMS с твоим местом на карте.">
+  <meta name="theme-color" content="#d32f2f">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="SOS Физра">
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <main class="page">
+
+    <!-- Ссылка открыта без номера преподавателя -->
+    <section id="screenNoConfig" class="screen" hidden>
+      <h1>Нет номера преподавателя</h1>
+      <p>Открой ссылку, которую дал преподаватель, или отсканируй QR-код в спортзале.</p>
+      <a class="btn" href="setup.html">Я преподаватель — создать ссылку</a>
+    </section>
+
+    <!-- Первый запуск: знакомимся -->
+    <section id="screenName" class="screen" hidden>
+      <h1>Тревожная кнопка</h1>
+      <p>Если на занятии станет плохо, нажми кнопку — преподавателю уйдёт SMS с твоим именем и местом на карте.</p>
+      <form id="nameForm" class="form">
+        <label>Твои фамилия и имя
+          <input id="nameInput" name="name" required maxlength="60" autocomplete="name" placeholder="Иванов Иван">
+        </label>
+        <button class="btn btn-primary btn-big" type="submit">Готово</button>
+      </form>
+      <p class="hint">После этого телефон спросит доступ к геолокации — разреши его, чтобы преподаватель знал, где тебя искать.</p>
+    </section>
+
+    <!-- Главный экран с кнопкой -->
+    <section id="screenMain" class="screen" hidden>
+      <p class="who"><span id="whoName"></span> · <button id="editName" class="link" type="button">изменить</button></p>
+      <p class="hint" id="recipientLine"></p>
+
+      <button id="sosButton" class="sos" type="button" aria-describedby="sosHint">
+        <span class="sos-title">SOS</span>
+        <span class="sos-sub">Мне плохо</span>
+      </button>
+      <p class="hint" id="sosHint">Нажми — откроется SMS преподавателю с твоим местом на карте</p>
+
+      <p id="geoLine" class="geo"></p>
+      <button id="geoAllow" class="btn btn-small" type="button" hidden>Разрешить геолокацию</button>
+
+      <div class="row">
+        <a class="btn" id="callTeacher" href="#">📞 Преподаватель</a>
+        <a class="btn btn-danger btn-compact" href="tel:112">📞 112</a>
+      </div>
+
+      <button id="testButton" class="link" type="button">Проверить, что всё работает</button>
+
+      <details class="install" id="installHint">
+        <summary>Добавить кнопку на экран телефона</summary>
+        <p data-os="ios">Safari: «Поделиться» <span aria-hidden="true">⬆️</span> → «На экран „Домой“». Кнопка откроется даже без интернета.</p>
+        <p data-os="android">Chrome: меню <span aria-hidden="true">⋮</span> → «Добавить на главный экран». Кнопка откроется даже без интернета.</p>
+      </details>
+    </section>
+
+    <!-- Отправка SMS -->
+    <section id="screenSend" class="screen" hidden>
+      <h1 id="sendTitle"></h1>
+      <p id="sendText"></p>
+      <a id="smsLink" class="btn btn-primary btn-big" href="#">Отправить SMS преподавателю</a>
+      <p class="hint">Откроется приложение «Сообщения» с готовым текстом — останется нажать «Отправить». Текст можно дополнить.</p>
+      <p class="preview" id="smsPreview"></p>
+      <div class="row">
+        <a class="btn" id="callTeacher2" href="#">📞 Преподаватель</a>
+        <a class="btn btn-danger btn-compact" href="tel:112">📞 112</a>
+      </div>
+      <details class="tips">
+        <summary>Пока ждёшь помощь</summary>
+        <ul>
+          <li>Сядь или ляг там, где безопасно, и не уходи с места.</li>
+          <li>Позови кого-нибудь рядом — не оставайся один.</li>
+          <li>Если становится хуже, болит в груди, трудно дышать или темнеет в глазах — сразу звони 112.</li>
+        </ul>
+      </details>
+      <button id="backButton" class="link" type="button">← Назад</button>
+    </section>
+
+  </main>
+</body>
+</html>

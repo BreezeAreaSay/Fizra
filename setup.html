@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Тревожная кнопка — ссылка для группы</title>
+  <meta name="theme-color" content="#d32f2f">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <script src="vendor/qrcode.js" defer></script>
+  <script type="module" src="setup.js"></script>
+</head>
+<body>
+  <main class="page">
+    <section class="screen" id="setupForm">
+      <h1>Ссылка для группы</h1>
+      <p>Укажите номер, на который придут SMS. Когда студенту станет плохо, он нажмёт кнопку — и вам придёт сообщение с его именем и точкой на карте.</p>
+      <form id="form" class="form">
+        <label>Ваш номер телефона
+          <input id="phone" type="tel" required autocomplete="tel" placeholder="+7 999 123-45-67">
+        </label>
+        <label>Как вас подписать <span class="opt">необязательно</span>
+          <input id="teacher" maxlength="40" placeholder="Ирина Петровна">
+        </label>
+        <label>Группа <span class="opt">необязательно</span>
+          <input id="group" maxlength="40" placeholder="ИВТ-21">
+        </label>
+        <p id="formError" class="error" hidden>Проверьте номер телефона.</p>
+        <button class="btn btn-primary btn-big" type="submit">Создать ссылку</button>
+      </form>
+    </section>
+
+    <section class="screen" id="result" hidden>
+      <div class="poster">
+        <h1>Тревожная кнопка</h1>
+        <p class="poster-group" id="posterGroup"></p>
+        <div class="qr" id="qr"></div>
+        <p>Стало плохо на занятии?<br>Отсканируй QR-код и нажми <b>SOS</b>.</p>
+      </div>
+
+      <label class="form">Ссылка для студентов
+        <input id="link" readonly>
+      </label>
+      <div class="row">
+        <button id="copy" class="btn" type="button">Скопировать</button>
+        <a id="open" class="btn" target="_blank" rel="noopener">Открыть</a>
+        <button id="print" class="btn" type="button">Распечатать</button>
+      </div>
+      <p class="hint">Отправьте ссылку в чат группы или повесьте QR-код в спортзале. Чтобы проверить, откройте ссылку и нажмите «Проверить, что всё работает» — вам придёт тестовая SMS.</p>
+      <button id="again" class="link" type="button">← Изменить данные</button>
+    </section>
+  </main>
+</body>
+</html>
