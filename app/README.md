@@ -1,6 +1,8 @@
 # Тревожная кнопка 2.0 — с панелью преподавателя
 
-Опубликовано: **https://app-ybcd9c.v2.appdeploy.ai/**
+**Как поставить на свой сервер — [selfhost/README.md](selfhost/README.md).** Там всё уже собрано: нужен только Node.js и ваш nginx/Caddy.
+
+Копия на хостинге AppDeploy: https://app-ybcd9c.v2.appdeploy.ai/ (из России открывается только через VPN).
 
 Что умеет:
 
@@ -43,13 +45,15 @@
 - Студент подтверждает себя токеном, который получил при регистрации: чужую тревогу отменить нельзя.
 - Телефоны студентов видит только преподаватель.
 
-## Локальный запуск
+## Два способа запуска из одних исходников
 
-На хостинге модули `@appdeploy/sdk` и `@appdeploy/client` подставляет платформа. Для проверки на своём компьютере есть заглушки в `local/` (база в памяти и WebSocket):
+- **Свой сервер** (`server/`, готовая сборка в `selfhost/`): `server/sdk.ts` — база в JSON-файле и WebSocket, `server/client.ts` — запросы из браузера, `server/main.ts` — HTTP-сервер. Сборка: `npm install && npm run selfhost:build`.
+- **AppDeploy**: платформа сама подставляет `@appdeploy/sdk` и `@appdeploy/client`.
+
+Проверить локально:
 
 ```bash
 npm install
-npm install --no-save ws@8
-npx vite build --config local/vite.config.local.ts
-node local/server.mjs   # http://localhost:8790/
+npm run selfhost:build
+cd selfhost && PORT=3077 DATA_DIR=./data node server.mjs   # http://localhost:3077/
 ```

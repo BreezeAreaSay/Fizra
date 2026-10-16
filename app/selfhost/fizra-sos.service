@@ -1,0 +1,18 @@
+# systemd-сервис: sudo cp fizra-sos.service /etc/systemd/system/ && sudo systemctl enable --now fizra-sos
+[Unit]
+Description=Тревожная кнопка для физкультуры
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/fizra/app/selfhost
+ExecStart=/usr/bin/env node /opt/fizra/app/selfhost/server.mjs
+Environment=PORT=3077
+# Отдельный непривилегированный пользователь; данные — в /var/lib/fizra-sos
+DynamicUser=yes
+StateDirectory=fizra-sos
+Environment=DATA_DIR=/var/lib/fizra-sos
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

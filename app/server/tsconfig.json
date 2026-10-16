@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "noUnusedLocals": true,
+    "lib": ["ES2022", "DOM"],
+    "types": ["node"]
+  },
+  "files": ["./main.ts", "./sdk.ts", "./client.ts", "../backend/routes.ts", "./types.d.ts"]
+}

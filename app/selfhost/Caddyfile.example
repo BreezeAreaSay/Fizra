@@ -1,0 +1,12 @@
+# Вариант 1: путь /sos/ на существующем сайте (внутри его блока)
+# example.ru {
+#     redir /sos /sos/
+#     handle_path /sos/* {
+#         reverse_proxy 127.0.0.1:3077
+#     }
+# }
+
+# Вариант 2: отдельный поддомен — Caddy сам получит сертификат
+sos.example.ru {
+    reverse_proxy 127.0.0.1:3077
+}

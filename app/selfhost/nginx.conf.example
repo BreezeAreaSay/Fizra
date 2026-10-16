@@ -1,0 +1,33 @@
+# ===== Вариант 1: путь /sos/ на сайте, который уже работает =====
+# Вставьте внутрь существующего блока server { ... } с вашим доменом и HTTPS.
+
+location = /sos {
+    return 301 /sos/;
+}
+
+location /sos/ {
+    proxy_pass http://127.0.0.1:3077/;    # слэш в конце обязателен: /sos/ отрезается
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade; # WebSocket для живых обновлений
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $host;
+    proxy_read_timeout 1h;
+}
+
+# ===== Вариант 2: отдельный поддомен, например sos.example.ru =====
+# Сертификат: sudo certbot --nginx -d sos.example.ru
+
+# server {
+#     listen 443 ssl;
+#     server_name sos.example.ru;
+#     # ssl_certificate и ssl_certificate_key добавит certbot
+#
+#     location / {
+#         proxy_pass http://127.0.0.1:3077;
+#         proxy_http_version 1.1;
+#         proxy_set_header Upgrade $http_upgrade;
+#         proxy_set_header Connection "upgrade";
+#         proxy_set_header Host $host;
+#         proxy_read_timeout 1h;
+#     }
+# }
