@@ -25,9 +25,9 @@
 
 ## Как опубликовать (бесплатно, GitHub Pages)
 
-1. В репозитории: **Settings → Pages**.
-2. **Source:** Deploy from a branch. **Branch:** ветка с этими файлами, папка **/ (root)** → **Save**.
-3. Через минуту сайт будет доступен по адресу вида `https://<имя>.github.io/Fizra/`, а страница настройки — `https://<имя>.github.io/Fizra/setup.html`.
+1. В репозитории: **Settings → Pages → Source: GitHub Actions**.
+2. Готовый сценарий `.github/workflows/pages.yml` сам публикует сайт после каждого изменения (ход публикации — во вкладке **Actions**).
+3. Сайт доступен по адресу вида `https://<имя>.github.io/Fizra/`, а страница настройки — `https://<имя>.github.io/Fizra/setup.html`.
 
 GitHub Pages сразу даёт HTTPS — без него браузер не разрешает геолокацию.
 
