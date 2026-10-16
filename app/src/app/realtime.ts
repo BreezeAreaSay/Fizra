@@ -13,9 +13,7 @@ let connection: Connection | null = null;
 const updateHandlers = new Set<UpdateHandler>();
 const statusHandlers = new Set<StatusHandler>();
 
-function parse(
-  raw: unknown,
-): {
+function parse(raw: unknown): {
   type?: string;
   payload?: { entity_type: string; entity_id: string; data: unknown };
 } | null {

@@ -394,6 +394,27 @@ export const appRoutes: RouterRoutes = {
     },
   ],
 
+  // Студент сам выходит из группы («выйти» на его телефоне).
+  'POST /api/groups/:code/students/:id/leave': [
+    async (ctx) => {
+      const code = String(ctx.params.code || '').toUpperCase();
+      const id = ctx.params.id;
+      if (!(await loadGroup(code)) || !ID_RE.test(id))
+        return json({ ok: true });
+      const [student] = await db.get<Student>(studentsTable(code), [id], {
+        consistent: true,
+      });
+      // Уже удалён (например, преподавателем) — выходить больше неоткуда.
+      if (!student) return json({ ok: true });
+      if (!safeEqual(bodyOf(ctx).token, student.token)) {
+        return error('Нет доступа', 403);
+      }
+      await db.delete(studentsTable(code), [id]);
+      await notifySubscribers('group', code, { kind: 'student_removed', id });
+      return json({ ok: true });
+    },
+  ],
+
   // Тревога от студента: сразу появляется на панели преподавателя.
   'POST /api/groups/:code/alerts': [
     async (ctx) => {

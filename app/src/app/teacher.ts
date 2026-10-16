@@ -10,6 +10,7 @@ import {
   formatTime,
   mapUrl,
   render,
+  routeTo,
   timeAgo,
 } from './common';
 import {
@@ -33,7 +34,7 @@ import {
   vibrate,
 } from './alarm';
 import { onStatus, onUpdate, reconnect, subscribe } from './realtime';
-import { rememberTeacherGroup } from './home';
+import { forgetTeacherGroup, rememberTeacherGroup } from './home';
 
 const TEMPLATE = `
 <main class="page page-wide">
@@ -52,7 +53,11 @@ const TEMPLATE = `
                 <h1 id="groupTitle"></h1>
                 <p class="hint" id="groupMeta"></p>
             </div>
-            <span id="conn" class="conn" role="status">● на связи</span>
+            <div class="dash-actions">
+                <span id="conn" class="conn" role="status">● на связи</span>
+                <a class="btn btn-small" href="#/">Мои группы</a>
+                <button id="logout" class="btn btn-small" type="button">Выйти</button>
+            </div>
         </header>
 
         <section class="banner" id="alarmBanner">
@@ -446,6 +451,16 @@ export function renderTeacher(code: string, key: string): () => void {
     ),
   );
   $('#printQr', app).addEventListener('click', () => window.print());
+
+  // «Выйти»: панель забывается на этом устройстве; вернуться можно по сохранённой ссылке.
+  $('#logout', app).addEventListener('click', () => {
+    const ok = confirm(
+      'Выйти из панели на этом устройстве? Вернуться можно будет по ссылке на панель — сохраните её, если ещё не сохранили.',
+    );
+    if (!ok) return;
+    forgetTeacherGroup(code);
+    routeTo('#/');
+  });
 
   // ---------- Старт ----------
 

@@ -68,8 +68,12 @@ bash attach-to-docker-nginx.sh <контейнер-nginx> <папка с кон�
 
 ```bash
 cd /opt/fizra && git pull
-sudo systemctl restart fizra-sos     # или: docker compose up -d --build
+sudo systemctl restart fizra-sos     # если запускали как службу
+# если кнопка в Docker рядом с nginx (attach-to-docker-nginx.sh):
+cd /opt/fizra/app/selfhost && PROXY_NETWORK=durag_default docker compose -f docker-compose.proxy.yml up -d --build
 ```
+
+Данные при обновлении сохраняются. У пользователей новая версия откроется при следующем заходе на страницу.
 
 ## Как собрано
 

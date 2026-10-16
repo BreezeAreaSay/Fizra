@@ -9,6 +9,7 @@ import {
   mapUrl,
   normalizePhone,
   render,
+  routeTo,
   show,
   smsUrl,
   storage,
@@ -17,6 +18,7 @@ import {
   cancelAlert,
   getAlertState,
   getGroup,
+  leaveGroup,
   registerStudent,
   sendAlert,
   sendAlertLocation,
@@ -71,7 +73,7 @@ const TEMPLATE = `
     </section>
 
     <section id="screenMain" class="screen" hidden>
-        <p class="who"><span id="whoName"></span> · <button id="editProfile" class="link" type="button">изменить</button></p>
+        <p class="who"><span id="whoName"></span> · <button id="editProfile" class="link" type="button">изменить</button> · <button id="leaveGroup" class="link" type="button">выйти</button></p>
         <p class="hint" id="groupLine"></p>
 
         <button id="sosButton" class="sos" type="button" aria-describedby="sosHint">
@@ -250,6 +252,29 @@ export function renderStudent(code: string): () => void {
   }
 
   $('#editProfile', app).addEventListener('click', showRegister);
+
+  // «Выйти»: убираем себя из списка группы и забываем регистрацию на этом телефоне.
+  $('#leaveGroup', app).addEventListener('click', async () => {
+    if (!profile) return;
+    const ok = confirm(
+      'Выйти из группы? Тебя уберут из списка преподавателя. Чтобы снова пользоваться кнопкой, нужно будет зарегистрироваться заново.',
+    );
+    if (!ok) return;
+    try {
+      await leaveGroup(code, {
+        studentId: profile.studentId,
+        token: profile.token,
+      });
+    } catch {
+      // Нет связи — на телефоне всё равно выходим, а из списка уберёт преподаватель.
+    }
+    for (const key of [profileKey(code), alertKey(code), groupKey(code)])
+      storage.remove(key);
+    if (storage.get<string | null>(LAST_STUDENT_KEY, null) === code)
+      storage.remove(LAST_STUDENT_KEY);
+    profile = null;
+    routeTo('#/');
+  });
   $('#sosButton', app).addEventListener('click', () => void startAlert(false));
   $('#testButton', app).addEventListener('click', () => void startAlert(true));
 

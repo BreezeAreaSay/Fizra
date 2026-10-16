@@ -22,11 +22,25 @@ export function rememberTeacherGroup(group: SavedGroup): void {
   storage.set(TEACHER_GROUPS_KEY, [group, ...list].slice(0, 10));
 }
 
+export function forgetTeacherGroup(code: string): void {
+  const list = storage
+    .get<SavedGroup[]>(TEACHER_GROUPS_KEY, [])
+    .filter((g) => g.code !== code);
+  storage.set(TEACHER_GROUPS_KEY, list);
+}
+
+// Ссылка на панель выглядит как …/#/t/КОД/КЛЮЧ — достаём из неё код и ключ.
+function parsePanelLink(text: string): { code: string; key: string } | null {
+  const m = /#\/t\/([A-Za-z0-9]{6})\/([^\s/?#]+)/.exec(text);
+  return m ? { code: m[1].toUpperCase(), key: m[2] } : null;
+}
+
 export function renderHome(): void {
-  // Открыли кнопку с экрана телефона без ссылки — возвращаем в свою группу.
   const lastStudent = storage.get<string | null>(LAST_STUDENT_KEY, null);
   const teacherGroups = storage.get<SavedGroup[]>(TEACHER_GROUPS_KEY, []);
-  if (lastStudent && teacherGroups.length === 0) {
+  // Кнопку открыли с экрана «Домой» — сразу возвращаем студента в его группу.
+  const standalone = matchMedia('(display-mode: standalone)').matches;
+  if (standalone && lastStudent && teacherGroups.length === 0) {
     routeTo(`#/s/${lastStudent}`);
     return;
   }
@@ -56,6 +70,12 @@ export function renderHome(): void {
                         <p class="hint">Мои группы:</p>
                         <ul id="myGroupsList"></ul>
                     </div>
+                    <p class="hint">Уже есть группа? Вставьте ссылку на её панель:</p>
+                    <form id="panelForm" class="inline-form" novalidate>
+                        <input id="panelInput" autocomplete="off" placeholder="Ссылка на панель" aria-label="Ссылка на панель преподавателя">
+                        <button class="btn" type="submit">Открыть</button>
+                    </form>
+                    <p id="panelError" class="error" role="alert" hidden>Это не ссылка на панель. Она выглядит так: …/#/t/КОД/КЛЮЧ</p>
                 </div>
             </section>
         </main>
@@ -68,6 +88,13 @@ export function renderHome(): void {
       6,
     ).toUpperCase();
     if (code.length === 6) routeTo(`#/s/${code}`);
+  });
+
+  $<HTMLFormElement>('#panelForm', app).addEventListener('submit', (event) => {
+    event.preventDefault();
+    const panel = parsePanelLink($<HTMLInputElement>('#panelInput', app).value);
+    $('#panelError', app).hidden = Boolean(panel);
+    if (panel) routeTo(`#/t/${panel.code}/${panel.key}`);
   });
 
   if (lastStudent) {

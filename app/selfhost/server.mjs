@@ -4210,6 +4210,25 @@ var appRoutes = {
       return json({ ok: true });
     }
   ],
+  // Студент сам выходит из группы («выйти» на его телефоне).
+  "POST /api/groups/:code/students/:id/leave": [
+    async (ctx) => {
+      const code = String(ctx.params.code || "").toUpperCase();
+      const id = ctx.params.id;
+      if (!await loadGroup(code) || !ID_RE.test(id))
+        return json({ ok: true });
+      const [student] = await db.get(studentsTable(code), [id], {
+        consistent: true
+      });
+      if (!student) return json({ ok: true });
+      if (!safeEqual(bodyOf(ctx).token, student.token)) {
+        return error("\u041D\u0435\u0442 \u0434\u043E\u0441\u0442\u0443\u043F\u0430", 403);
+      }
+      await db.delete(studentsTable(code), [id]);
+      await notifySubscribers("group", code, { kind: "student_removed", id });
+      return json({ ok: true });
+    }
+  ],
   // Тревога от студента: сразу появляется на панели преподавателя.
   "POST /api/groups/:code/alerts": [
     async (ctx) => {

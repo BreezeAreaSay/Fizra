@@ -88,6 +88,12 @@ export async function removeStudent(
   await api.delete(`/api/groups/${code}/students/${studentId}?${teacher(key)}`);
 }
 
+export async function leaveGroup(code: string, auth: StudentAuth) {
+  await api.post(`/api/groups/${code}/students/${auth.studentId}/leave`, {
+    token: auth.token,
+  });
+}
+
 export async function sendAlert(
   code: string,
   auth: StudentAuth,
